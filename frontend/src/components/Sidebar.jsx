@@ -40,17 +40,17 @@ export default function Sidebar({ activeChat, setActiveChat }) {
           updatedChats[existingChatIndex] = {
             ...updatedChats[existingChatIndex],
             lastMessage: newMsg,
-            // Only increment counter if chat is not open AND the current user is NOT the sender
+           
             unreadCount: activeChat?._id === targetChatId 
               ? 0 
               : (updatedChats[existingChatIndex].unreadCount || 0) + (currentSenderId !== user?._id ? 1 : 0)
           };
           
-          // Move the active chat block straight to the top of the list array
+          
           const [movedChat] = updatedChats.splice(existingChatIndex, 1);
           return [movedChat, ...updatedChats];
         } else {
-          // If it's a completely new chat thread starter, fetch the clean structural layout from API
+          
           fetchChats();
           return prevChats;
         }

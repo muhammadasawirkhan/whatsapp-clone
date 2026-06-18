@@ -18,28 +18,28 @@ export const initSocket = (io) => {
     socket.on("message:send", async (data) => {
       const { chatId, message } = data;
 
-      // 1. Send live message to receiver if they are inside the chat window
+     
       socket.to(chatId).emit("message:receive", message);
 
-      // 2. Send live update to SENDER'S sidebar instantly
+    
       socket.emit("sidebar:update", message);
 
-      // 3. Extract receiver ID safely with fallbacks
+      
       const receiverId = message.receiverId || message.receiver?._id || message.receiver;
       const recipientSocketId = onlineUsers.get(receiverId);
 
       if (recipientSocketId) {
-        // Update message status to delivered in database
+        
         await Message.findByIdAndUpdate(message._id, {
           status: "delivered",
         });
 
         const updatedMessage = { ...message, status: "delivered" };
         
-        // Send live update to RECEIVER'S sidebar
+        
         io.to(recipientSocketId).emit("sidebar:update", updatedMessage);
 
-        // Send delivery tick confirmation back to sender
+        
         socket.emit("message:status", {
           messageId: message._id,
           status: "delivered",
@@ -50,13 +50,13 @@ export const initSocket = (io) => {
     socket.on("message:read", async ({ chatId, senderId }) => {
       const senderSocketId = onlineUsers.get(senderId);
 
-      // Permanently update unread messages to "read" status in MongoDB
+      
       await Message.updateMany(
         { chat: chatId, sender: senderId, status: { $ne: "read" } },
         { $set: { status: "read" } }
       );
 
-      // Send blue tick notification to sender if they are online
+      
       if (senderSocketId) {
         io.to(senderSocketId).emit("message:read:update", {
           chatId,

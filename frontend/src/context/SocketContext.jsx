@@ -10,17 +10,34 @@ export const SocketProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
-    if (user) {
+  
+    if (user && user._id) {
       const s = getSocket();
       setSocket(s);
+
+      
       s.emit('user:online', user._id);
+
+      
       s.on('users:online', (users) => setOnlineUsers(users));
-      return () => { s.off('users:online'); };
+
+      
+      const handleReconnect = () => {
+        s.emit('user:online', user._id);
+      };
+      s.on('connect', handleReconnect);
+
+     
+      return () => { 
+        s.off('users:online'); 
+        s.off('connect', handleReconnect);
+      };
     } else {
+      
       disconnectSocket();
       setSocket(null);
     }
-  }, [user]);
+  }, [user]); 
 
   return (
     <SocketContext.Provider value={{ socket, onlineUsers }}>

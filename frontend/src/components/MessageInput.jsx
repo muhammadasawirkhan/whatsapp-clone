@@ -35,7 +35,7 @@ export default function MessageInput({ chat, onMessageSent, otherUserId }) {
       setText('');
       
       if (socket) {
-        // Normalize structural layouts so frontend mappers can parse them safely
+        
         const normalizedMessage = {
           ...data,
           chat: data.chat || chat._id,

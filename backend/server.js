@@ -32,7 +32,7 @@ const io = new Server(server, {
 app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

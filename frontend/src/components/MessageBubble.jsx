@@ -17,7 +17,8 @@ export default function MessageBubble({ message, isOwn }) {
             <div className={`max-w-[65%] rounded-xl px-3 py-2 shadow-sm relative ${isOwn ? 'bg-whatsapp-light rounded-tr-none' : 'bg-white rounded-tl-none'}`}>
                 {isImage && (
                     <img
-                        src={`${import.meta.env.VITE_API_URL}${message.fileUrl}`}
+                        // src={`${import.meta.env.VITE_API_URL}${message.fileUrl}`}
+                        src={message.fileUrl}
                         alt="attachment"
                         className="max-w-full rounded-lg mb-1 cursor-pointer"
                         onClick={() => window.open(`${import.meta.env.VITE_API_URL}${message.fileUrl}`, '_blank')}
@@ -25,7 +26,8 @@ export default function MessageBubble({ message, isOwn }) {
                 )}
                 {isFile && (
                     <a
-                        href={`${import.meta.env.VITE_API_URL}${message.fileUrl}`}
+                        // href={`${import.meta.env.VITE_API_URL}${message.fileUrl}`}
+                        src={message.fileUrl}
                         target="_blank"
                         rel="noreferrer"
                         className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 mb-1 hover:bg-gray-200 transition-colors"

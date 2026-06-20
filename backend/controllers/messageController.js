@@ -1,27 +1,42 @@
 import Message from '../models/Message.js';
 import Chat from '../models/Chat.js';
 
+// export const sendMessage = async (req, res) => {
+//   const { chatId, content } = req.body;
+
+//   const fileUrl = req.file ? `/uploads/${req.file.filename}` : '';
+//   const fileType = req.file ? req.file.mimetype : '';
+
+//   try {
+//     let message = await Message.create({
+//       chat: chatId,
+//       sender: req.user._id,
+//       content: content || '',
+//       fileUrl,
+//       fileType,
+//     });
+
+//     message = await message.populate('sender', 'name avatar');
+
+//     await Chat.findByIdAndUpdate(chatId, {
+//       lastMessage: message._id,
+//     });
+
+//     res.status(201).json(message);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
 export const sendMessage = async (req, res) => {
   const { chatId, content } = req.body;
-
-  const fileUrl = req.file ? `/uploads/${req.file.filename}` : '';
+  // Cloudinary returns the full URL in req.file.path
+  const fileUrl = req.file ? req.file.path : '';
   const fileType = req.file ? req.file.mimetype : '';
-
   try {
-    let message = await Message.create({
-      chat: chatId,
-      sender: req.user._id,
-      content: content || '',
-      fileUrl,
-      fileType,
-    });
-
+    let message = await Message.create({ chat: chatId, sender: req.user._id, content: content || '', fileUrl, fileType });
     message = await message.populate('sender', 'name avatar');
-
-    await Chat.findByIdAndUpdate(chatId, {
-      lastMessage: message._id,
-    });
-
+    await Chat.findByIdAndUpdate(chatId, { lastMessage: message._id });
     res.status(201).json(message);
   } catch (err) {
     res.status(500).json({ message: err.message });

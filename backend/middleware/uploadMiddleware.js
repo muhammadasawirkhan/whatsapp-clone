@@ -22,7 +22,7 @@ const storage = new CloudinaryStorage({
   params: {
     folder: "whatsapp-clone",
     resource_type: "auto",
-    allowed_formats: ["jpg", "jpeg", "png", "gif", "pdf", "mp4", "mp3", "doc", "docx", "zip"],
+    allowed_formats: ["jpg", "jpeg", "png", "gif", "pdf", "mp4", "mp3", "doc", "docx", "zip",'webm'],
   },
 });
 

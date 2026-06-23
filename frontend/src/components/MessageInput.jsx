@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import api from '../utils/api';
 import { useSocket } from '../context/SocketContext';
 import EmojiPickerComponent from './EmojiPickerComponent';
-import VoiceRecorder from './VoiceRecorder';
+import VoiceRecorder from './voiceRecorder';
 
 export default function MessageInput({ chat, onMessageSent, otherUserId }) {
   const [text, setText] = useState('');

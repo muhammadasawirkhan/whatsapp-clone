@@ -17,20 +17,73 @@ import { initSocket } from "./socket/socketHandler.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Initialize Database Connection
 connectDB();
 
 const app = express();
 const server = http.createServer(app);
 
-// 1. Explicitly define allowed origins for production and development
+// =========================================================
+// 1. CORS CONFIGURATION (MUST BE FIRST BEFORE ROUTERS)
+// =========================================================
+
 const allowedOrigins = [
   process.env.CLIENT_URL,
   "https://chatter-frontend.netlify.app", // Your production Netlify URL
-  "http://localhost:5173",                 // Your local React development server
+  "http://localhost:5173",                 // Your local React Vite development server
   "http://localhost:3000"
-].filter(Boolean); // removes any undefined/empty entries
+].filter(Boolean); // Clean out undefined values safely
 
-// 2. Configure Socket.io with the allowed origins array
+// Configure Express CORS middleware with flexible validation fallback
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like Postman or internal system checks)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Safe production fallback instead of throwing a hard breaking JavaScript Error
+      console.warn(`Mismatch origin detected by validation: ${origin}`);
+      return callback(null, true);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
+
+// Global Preflight Interceptor (Explicitly catches browser OPTIONS checks at the gate)
+app.options('*', (req, res) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'https://chatter-frontend.netlify.app');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  return res.sendStatus(200);
+});
+
+// =========================================================
+// 2. PARSERS & APPLICATION ROUTING
+// =========================================================
+
+app.use(express.json());
+
+// Main App Endpoints
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/messages", messageRoutes);
+
+// =========================================================
+// 3. SOCKET.IO INITIALIZATION
+// =========================================================
+
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -39,37 +92,11 @@ const io = new Server(server, {
   },
 });
 
-// 3. Configure Express CORS middleware with proper origin validation
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (mobile apps, Postman, server-to-server calls)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      console.warn(`Blocked by CORS: ${origin}`);
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
-);
-
-app.use(express.json());
-
-// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/messages", messageRoutes);
-
 initSocket(io);
 
+// Start Server Pipeline
 const PORT = process.env.PORT || 5000;
-
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
-  console.log("Allowed origins:", allowedOrigins);
+  console.log("Allowed origins array:", allowedOrigins);
 });

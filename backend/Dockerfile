@@ -3,10 +3,10 @@ FROM node:20-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --production
+# Clean production install
+RUN npm ci --only=production
 
 COPY . .
 
-EXPOSE 8080
-
+# Back4app injects its own PORT variable at runtime
 CMD ["node", "server.js"]

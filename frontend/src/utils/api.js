@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const PRODUCTION_BACKEND_URL = "http://whatsappbackend1-zk959lia.b4a.run/";
+const PRODUCTION_BACKEND_URL = "https://whatsappbackend1-zk959lia.b4a.run/";
 
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';

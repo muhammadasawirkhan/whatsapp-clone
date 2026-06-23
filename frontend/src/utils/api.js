@@ -1,11 +1,9 @@
 import axios from 'axios';
 
-
-const PRODUCTION_BACKEND_URL = "https://whatsappbackend1-zk959lia.b4a.run/";
-
+// 1. MUST NOT HAVE A SLASH AT THE END
+const PRODUCTION_BACKEND_URL = "https://whatsappbackend1-zk959lia.b4a.run";
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
 
 const baseURL = isLocalhost 
   ? (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api'
@@ -15,7 +13,6 @@ const api = axios.create({
   baseURL,
   withCredentials: true 
 });
-
 
 api.interceptors.request.use((config) => {
   const user = JSON.parse(localStorage.getItem('user'));

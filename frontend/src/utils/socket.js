@@ -4,7 +4,10 @@ let socket;
 
 export const getSocket = () => {
   if (!socket) {
-    socket = io(import.meta.env.VITE_API_URL, { transports: ['websocket'] });
+    // socket = io(import.meta.env.VITE_API_URL, { transports: ['websocket'] });
+    socket = io(import.meta.env.VITE_API_URL, {
+      withCredentials: true
+    });
   }
   return socket;
 };
